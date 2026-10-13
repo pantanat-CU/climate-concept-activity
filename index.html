@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Climate Concepts, Loops and Forecasts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12212B; --muted:#63757F; --paper:#EAEFF2; --surface:#fff; --field:#F6F9FA;
+  --line:#CFD9DE; --navbg:#DFE7EB; --deckA:#1F7A9E; --deckB:#C4601F; --loop:#4A7C3F;
+  --good:#2E7D5B; --bad:#C0392B; --okbg:#EFF7F2; --nobg:#FCF0EE; --loopbg:#F2F7F0;
+  --goodtxt:#1D5C41; --badtxt:#8E2C21; --accent:var(--deckA);
+  --r:14px; --shadow:0 1px 2px rgba(18,33,43,.06),0 8px 24px rgba(18,33,43,.06);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink:#E3EBEF; --muted:#93A6B0; --paper:#0F1A20; --surface:#17252D; --field:#1D2C34;
+  --line:#2E404A; --navbg:#1B2A32; --deckA:#4BA3C7; --deckB:#E0884F; --loop:#7FB070;
+  --good:#5BBF8E; --bad:#E5685A; --okbg:#15302A; --nobg:#3A1E1B; --loopbg:#1E2E1C;
+  --goodtxt:#9FE0BF; --badtxt:#F4B1A8; --shadow:0 1px 2px rgba(0,0,0,.3);
+}}
+:root[data-theme="dark"]{
+  --ink:#E3EBEF; --muted:#93A6B0; --paper:#0F1A20; --surface:#17252D; --field:#1D2C34;
+  --line:#2E404A; --navbg:#1B2A32; --deckA:#4BA3C7; --deckB:#E0884F; --loop:#7FB070;
+  --good:#5BBF8E; --bad:#E5685A; --okbg:#15302A; --nobg:#3A1E1B; --loopbg:#1E2E1C;
+  --goodtxt:#9FE0BF; --badtxt:#F4B1A8; --shadow:0 1px 2px rgba(0,0,0,.3);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--paper)}
+*,*::before,*::after{box-sizing:inherit;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font:400 16px/1.55 "IBM Plex Sans Thai",system-ui,-apple-system,"Noto Sans Thai",sans-serif}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px 56px}
+header{padding:18px 0 10px}
+.brow{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+h1{font-size:19px;font-weight:700;margin:0;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:12.5px;margin-top:2px}
+.langbtn{border:1px solid var(--line);background:var(--surface);color:var(--muted);
+  border-radius:99px;padding:5px 13px;font:600 12px/1 "IBM Plex Mono",ui-monospace,monospace;cursor:pointer}
+.stripes{margin-top:14px;height:44px;width:100%;display:block;border-radius:8px;overflow:hidden}
+.stripes .veil{fill:var(--paper);transition:opacity .7s ease}
+.stripes .cur{fill:none;stroke:var(--ink);stroke-width:2.5}
+.seglab{display:grid;grid-template-columns:repeat(5,1fr);margin-top:5px;font-size:11px;color:var(--muted);text-align:center;line-height:1.25}
+.seglab .sdone{color:var(--ink);font-weight:600}
+.scap{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--muted);margin-top:6px}
+.scap b{color:var(--ink);font-weight:600;white-space:nowrap}
+.keeling .kbase{fill:none;stroke:var(--line);stroke-width:1.5}
+.keeling .kdraw{fill:none;stroke:var(--accent);stroke-width:2.2;stroke-linecap:round;
+  transition:stroke-dashoffset .6s cubic-bezier(.2,.7,.3,1)}
+.kcap{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:-4px}
+nav{display:flex;gap:6px;margin:14px 0 18px;background:var(--navbg);padding:4px;border-radius:12px}
+nav button{flex:1;border:0;background:transparent;color:var(--muted);border-radius:9px;
+  padding:9px 4px;font:600 13px/1.2 "IBM Plex Sans Thai",sans-serif;cursor:pointer}
+nav button .n{display:block;font-size:10.5px;font-weight:500;opacity:.75;margin-top:2px}
+nav button[aria-selected=true]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.q{font-size:13px;color:var(--muted);margin:0 0 10px}
+.big{border:0;width:100%;text-align:left;background:var(--surface);border-radius:var(--r);
+  box-shadow:var(--shadow);padding:16px 18px;margin-bottom:10px;cursor:pointer;font:inherit;color:inherit;
+  display:flex;align-items:center;gap:14px;transition:transform .12s}
+.big:active{transform:scale(.99)}
+.big .t{display:block;font-weight:600;font-size:16px}
+.big .d{display:block;color:var(--muted);font-size:12.5px;margin-top:3px}
+.dot{width:10px;height:10px;border-radius:99px;background:var(--accent);flex:none}
+.rolebar{display:flex;align-items:center;gap:10px;background:var(--surface);border-radius:99px;
+  padding:7px 8px 7px 14px;box-shadow:var(--shadow);margin-bottom:14px;font-size:13px;font-weight:600}
+.rolebar button{margin-left:auto;border:1px solid var(--line);background:transparent;color:var(--muted);
+  border-radius:99px;padding:5px 12px;font:500 12px "IBM Plex Sans Thai",sans-serif;cursor:pointer;white-space:nowrap}
+
+/* solo round 1 */
+.reader{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);
+  padding:18px 18px 16px;border-top:4px solid var(--accent)}
+.reader.ok{border-top-color:var(--good)} .reader.no{border-top-color:var(--bad)}
+.rtop{display:flex;align-items:center;gap:10px}
+.badge{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;font-size:14px;color:#fff;
+  background:var(--accent);width:32px;height:32px;border-radius:9px;display:grid;place-items:center;flex:none}
+.count{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;color:var(--muted)}
+.arrows{margin-left:auto;display:flex;gap:6px}
+.arrows button{width:38px;height:34px;border:1px solid var(--line);background:var(--surface);border-radius:9px;
+  color:var(--ink);font:600 16px/1 "IBM Plex Mono",monospace;cursor:pointer}
+.arrows button:disabled{opacity:.3;cursor:default}
+.readtxt{font-size:18px;line-height:1.6;margin:14px 0 4px;min-height:5.2em}
+.hint{font-size:12.5px;color:var(--muted);margin:14px 0 8px}
+.terms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.term{position:relative;border:1px solid var(--line);background:var(--surface);border-radius:10px;
+  padding:11px 12px;text-align:left;font:500 14px/1.3 "IBM Plex Sans Thai",sans-serif;color:var(--ink);cursor:pointer;
+  display:flex;align-items:center;gap:8px;min-height:46px}
+.term .tag{margin-left:auto;font:600 11px "IBM Plex Mono",monospace;color:var(--muted);
+  border:1px solid var(--line);border-radius:6px;padding:1px 6px;flex:none}
+.term.taken{color:var(--muted)}
+.term[aria-pressed=true]{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 28%,transparent);font-weight:600;color:var(--ink)}
+.term[aria-pressed=true] .tag{background:var(--accent);border-color:var(--accent);color:#fff}
+.term.ok{border-color:var(--good);background:var(--okbg);box-shadow:none}
+.term.ok .tag{background:var(--good);border-color:var(--good)}
+.term.no{border-color:var(--bad);background:var(--nobg);box-shadow:none}
+.term.no .tag{background:var(--bad);border-color:var(--bad)}
+.term.sol{outline:2px dashed var(--good);outline-offset:2px}
+.dots{display:flex;gap:5px;justify-content:center;margin:14px 0 2px;flex-wrap:wrap}
+.dots button{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:var(--surface);
+  font:600 11px "IBM Plex Mono",monospace;color:var(--muted);cursor:pointer;padding:0}
+.dots button.done{background:var(--accent);border-color:var(--accent);color:#fff}
+.dots button.ok{background:var(--good);border-color:var(--good);color:#fff}
+.dots button.no{background:var(--bad);border-color:var(--bad);color:#fff}
+.dots button.cur{outline:2px solid var(--ink);outline-offset:1px}
+.review{margin-top:14px}
+.rrow{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;border:0;background:var(--surface);
+  border-radius:11px;padding:10px 12px;margin-bottom:6px;font:inherit;color:inherit;cursor:pointer;
+  box-shadow:0 1px 2px rgba(18,33,43,.05)}
+.rrow.ok{background:var(--okbg)} .rrow.no{background:var(--nobg)}
+.rrow .l{font:600 12px "IBM Plex Mono",monospace;color:var(--muted);width:16px;flex:none;padding-top:2px}
+.rrow .x{flex:1;min-width:0}
+.rrow .tm{font-weight:600;font-size:14px}
+.rrow.no .tm{color:var(--badtxt)} .rrow.ok .tm{color:var(--goodtxt)}
+.rrow .ds{font-size:12px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.rrow .ans{font-size:12px;color:var(--goodtxt);font-weight:600}
+
+.btn{width:100%;border:0;background:var(--accent);color:#fff;border-radius:12px;padding:14px;
+  font:600 15px "IBM Plex Sans Thai",sans-serif;cursor:pointer;margin-top:14px}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--muted);margin-top:8px}
+.banner{border-radius:12px;padding:13px 15px;margin-top:14px;font-size:14px;line-height:1.5}
+.banner.good{background:var(--okbg);color:var(--goodtxt)}
+.banner.bad{background:var(--nobg);color:var(--badtxt)}
+.score{font-family:"IBM Plex Mono",monospace;font-size:26px;font-weight:600;margin-right:6px}
+
+/* round 2 */
+.slots{display:flex;gap:6px;margin:10px 0 6px}
+.slot{flex:1;aspect-ratio:1/1.15;border:1.5px dashed var(--line);border-radius:10px;background:var(--surface);
+  display:grid;place-items:center;font:600 17px "IBM Plex Mono",monospace;color:var(--muted);cursor:pointer;padding:2px}
+.slot.filled{border-style:solid;border-color:var(--loop);color:var(--loop);background:var(--loopbg)}
+.slot.ok{border-color:var(--good);background:var(--okbg);color:var(--good)}
+.slot.no{border-color:var(--bad);background:var(--nobg);color:var(--bad)}
+.pool{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 4px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 11px;
+  font:500 13px/1.35 "IBM Plex Sans Thai",sans-serif;color:var(--ink);cursor:pointer;text-align:left;
+  max-width:100%;display:flex;gap:8px;align-items:flex-start}
+.chip .num{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--loop);flex:none}
+.chip[aria-pressed=true]{border-color:var(--loop);background:var(--loopbg);box-shadow:0 0 0 2px rgba(74,124,63,.18)}
+.chip.used{opacity:.28;pointer-events:none}
+.types{display:flex;gap:7px;margin-top:8px}
+.types button{flex:1;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 6px;
+  font:500 12.5px "IBM Plex Sans Thai",sans-serif;color:var(--muted);cursor:pointer}
+.types button[aria-pressed=true]{border-color:var(--loop);background:var(--loopbg);color:var(--loop);font-weight:600}
+.lt{font-size:12px;color:var(--muted);margin:14px 0 2px;font-weight:600}
+/* summary tab */
+.field{display:block;margin-bottom:14px}
+.field span{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:5px}
+.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:10px;padding:10px 12px;font:400 15px/1.5 "IBM Plex Sans Thai",sans-serif}
+.field textarea{min-height:84px;resize:vertical}
+.small{font-size:12.5px;color:var(--muted);margin:-2px 0 10px}
+.warn{font-size:12.5px;color:var(--badtxt);margin-top:4px}
+.sect{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;margin-bottom:12px}
+.sect h2{font-size:15px;margin:0 0 4px}
+.corrdef{font-size:13px;color:var(--muted);background:var(--field);border-radius:9px;padding:9px 11px;margin:-4px 0 10px}
+.corrdef b{color:var(--goodtxt)}
+.summary{background:var(--surface);border:2px solid var(--accent);border-radius:16px;padding:18px;margin-top:18px}
+.summary .sh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:10px}
+.summary .who{font-size:18px;font-weight:700}
+.summary .when{font:500 11.5px "IBM Plex Mono",monospace;color:var(--muted);text-align:right}
+.summary h3{font-size:13px;margin:14px 0 6px;color:var(--muted)}
+.summary table{width:100%;border-collapse:collapse;font-size:13.5px}
+.summary th,.summary td{text-align:left;padding:5px 6px;border-bottom:1px solid var(--line)}
+.summary th{font-weight:600;color:var(--muted);font-size:12px}
+.summary td.n{font-family:"IBM Plex Mono",monospace;font-weight:600}
+.summary .txt{font-size:14px;line-height:1.55;background:var(--field);border-radius:9px;padding:9px 11px;white-space:pre-wrap}
+.summary .lbl{font-size:12px;color:var(--muted);margin:6px 0 3px}
+.empty{color:var(--badtxt);font-style:italic}
+/* guide */
+.guide h2{font-size:17px;margin:0 0 6px}
+.guide .intro{color:var(--muted);font-size:14px;margin:0 0 16px}
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:34px 1fr;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.steps li:last-child{border-bottom:0}
+.steps li::before{content:counter(s);width:30px;height:30px;border-radius:99px;background:var(--accent);color:#fff;
+  display:grid;place-items:center;font:600 14px "IBM Plex Mono",monospace}
+.steps b{display:block;font-size:15px;margin-bottom:2px}
+.steps span{font-size:14px;color:var(--muted);line-height:1.55}
+.know{background:var(--field);border-radius:12px;padding:12px 14px;margin-top:14px;font-size:13.5px}
+.know p{margin:0 0 6px;font-size:13px;line-height:1.55;color:var(--muted)} .know p:last-child{margin:0}
+.know strong{display:block;margin-bottom:6px;font-size:13px}
+/* round 3 */
+.sc{background:var(--surface);border-radius:12px;box-shadow:0 1px 2px rgba(18,33,43,.05);padding:12px 14px;margin-bottom:8px}
+.sc.ok{background:var(--okbg)} .sc.no{background:var(--nobg)}
+.sc .top{display:flex;align-items:baseline;gap:10px}
+.sc .nm{font:600 14px "IBM Plex Mono",monospace;color:var(--accent)}
+.sc .val{margin-left:auto;font:600 17px "IBM Plex Mono",monospace;min-width:62px;text-align:right}
+.sc .val.unset{color:var(--muted);font-weight:500}
+.sc .story{font-size:13.5px;font-weight:600;margin-top:2px}
+.sc .ds{font-size:13px;color:var(--muted);margin:2px 0 8px;line-height:1.5}
+.sc input[type=range]{width:100%;accent-color:var(--accent)}
+.track{position:relative;height:22px;margin:8px 0 2px;background:var(--field);border-radius:6px}
+.track .band{position:absolute;top:4px;bottom:4px;background:color-mix(in srgb,var(--good) 35%,transparent);border-radius:4px}
+.track .best{position:absolute;top:2px;bottom:2px;width:2px;background:var(--good)}
+.track .me{position:absolute;top:-3px;width:12px;height:28px;margin-left:-6px;border-radius:4px;border:2px solid var(--ink);background:var(--surface)}
+.rlab{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)}
+.mc{background:var(--surface);border-radius:12px;box-shadow:0 1px 2px rgba(18,33,43,.05);padding:14px;margin-bottom:10px}
+.mc .qq{font-weight:600;font-size:15px;margin:0 0 10px}
+.opt{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  border-radius:10px;padding:10px 12px;margin-bottom:6px;font:400 14px/1.45 "IBM Plex Sans Thai",sans-serif;cursor:pointer}
+.opt[aria-pressed=true]{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 28%,transparent);font-weight:600}
+.opt.ok{border-color:var(--good);background:var(--okbg);box-shadow:none}
+.opt.no{border-color:var(--bad);background:var(--nobg);box-shadow:none}
+.expl{font-size:13px;line-height:1.55;margin-top:4px;color:var(--goodtxt)}
+.expl.no{color:var(--badtxt)}
+.done{background:var(--okbg);color:var(--goodtxt);border-radius:12px;padding:12px 14px;font-size:14px}
+/* capture banner */
+.capture{display:flex;align-items:center;gap:12px;background:var(--accent);color:#fff;border-radius:12px;
+  padding:14px 16px;margin:-4px 0 14px;font-size:18px;font-weight:700;line-height:1.35}
+.capture .ic{font-size:26px;line-height:1}
+.capture small{display:block;font-size:12.5px;font-weight:500;opacity:.9}
+.scrollnote{font-size:14px;font-weight:600;color:var(--accent);margin:0 0 12px}
+.take{background:var(--field);border-radius:10px;padding:10px 12px;margin-top:8px}
+.take strong{display:block;font-size:12.5px;color:var(--muted);margin-bottom:4px}
+.take ul{margin:0;padding-left:18px} .take li{font-size:13px;line-height:1.55;margin-bottom:4px} .take li:last-child{margin:0}
+.takes{margin-top:18px}
+.takes h3{font-size:13.5px;margin:14px 0 6px;color:var(--accent)}
+.takes ul{margin:0;padding-left:18px} .takes li{font-size:14px;line-height:1.6;margin-bottom:6px}
+.stripes.mini{height:22px;margin:4px 0 4px;border-radius:6px}
+.prog{font-size:12px;color:var(--muted);text-align:right}
+.summary .sh .who{font-size:18px}
+.summary .sid{font-size:14px;margin-top:2px} .summary .sid b{font-family:"IBM Plex Mono",monospace;font-weight:600}
+.idrow{display:grid;grid-template-columns:3fr 2fr;gap:12px} .idrow .field{margin:0}
+@media (max-width:480px){.idrow{grid-template-columns:1fr}}
+.okline{color:var(--goodtxt);font-size:13.5px;font-weight:600}
+@media (max-width:560px){nav button .n{display:none} nav button{font-size:12.5px;padding:10px 2px}}
+@media (max-width:380px){.terms{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+:focus-visible{outline:2.5px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brow">
+      <div><h1 id="h1"></h1><div class="sub" id="sub"></div></div>
+      <button class="langbtn" id="lang"></button>
+    </div>
+    <svg class="stripes" id="stripes" viewBox="0 0 600 44" preserveAspectRatio="none" role="img"></svg>
+    <div class="seglab" id="seglab"></div>
+    <div class="scap"><span id="scap"></span><b id="kright"></b></div>
+  </header>
+  <nav id="nav"></nav>
+  <main id="main"></main>
+</div>
+<script>
+const DATA = {"en": {"decks": [{"terms": [{"id": "A1", "text": "Weather"}, {"id": "A2", "text": "Climate"}, {"id": "A3", "text": "Energy surplus & deficit"}, {"id": "A4", "text": "Albedo"}, {"id": "A5", "text": "Positive feedback"}, {"id": "A6", "text": "Negative feedback"}, {"id": "A7", "text": "Troposphere"}, {"id": "A8", "text": "Stratosphere"}, {"id": "A9", "text": "Lithosphere"}, {"id": "A10", "text": "Hydrosphere"}, {"id": "A11", "text": "Biosphere"}, {"id": "A12", "text": "Cryosphere"}], "defs": [{"letter": "a", "text": "A loop that amplifies the change that started it. Warming melts ice, reflectivity drops, more sunlight is absorbed, and the warming grows."}, {"letter": "b", "text": "Every living organism on the planet, together with their interactions across land, water and air."}, {"letter": "c", "text": "The 30-year average of weather conditions in a particular area. What you expect."}, {"letter": "d", "text": "12–50 km. Home of the ozone layer; temperature rises with height because ozone absorbs ultraviolet radiation."}, {"letter": "e", "text": "The frozen parts of the planet: glaciers, sea ice, ice sheets, snow cover and permafrost."}, {"letter": "f", "text": "The state of the atmosphere at one place over a short period — today's rain, fog, storm or wind. What you get."}, {"letter": "g", "text": "The rigid outer shell of the planet — crust plus uppermost mantle, roughly 100 km deep. Drives weathering, soil formation and slow carbon cycling."}, {"letter": "h", "text": "A surface's reflectivity. Snow and ice send back 70–90% of arriving sunlight; bare ground and water absorb about 90% of it."}, {"letter": "i", "text": "0–12 km. Holds about 75% of the atmosphere's mass and most of its water vapour; temperature falls with height and all weather happens here."}, {"letter": "j", "text": "Tropical latitudes absorb more solar energy than they emit; polar latitudes emit more longwave radiation than they receive. Air and ocean carry the difference poleward."}, {"letter": "k", "text": "All the water on Earth, moving continuously through evaporation, condensation, precipitation and collection."}, {"letter": "l", "text": "A loop that opposes the change that started it. Warming speeds chemical weathering, weathering draws down CO₂, and the Earth cools back toward equilibrium."}], "answers": {"A1": "f", "A2": "c", "A3": "j", "A4": "h", "A5": "a", "A6": "l", "A7": "i", "A8": "d", "A9": "g", "A10": "k", "A11": "b", "A12": "e"}, "title": "Deck A — The Climate System"}, {"terms": [{"id": "B1", "text": "Eccentricity"}, {"id": "B2", "text": "Obliquity"}, {"id": "B3", "text": "Precession"}, {"id": "B4", "text": "Volcanic aerosols"}, {"id": "B5", "text": "Enhanced greenhouse effect"}, {"id": "B6", "text": "Methane (CH₄)"}, {"id": "B7", "text": "Global warming potential"}, {"id": "B8", "text": "Ice cores"}, {"id": "B9", "text": "Tree rings"}, {"id": "B10", "text": "The Keeling Curve"}, {"id": "B11", "text": "Mitigation"}, {"id": "B12", "text": "Adaptation"}], "defs": [{"letter": "m", "text": "The warming caused by a pulse of a gas compared with the same mass of CO₂ over a set period. For methane: 86 over 20 years, but only 34 over 100 years."}, {"letter": "n", "text": "Earth's axial tilt swings between 21.1° and 24.5° over about 41,000 years, changing how strong the seasons are. It sits at 23.5° today."}, {"letter": "o", "text": "The CO₂ record begun by Charles Keeling at Mauna Loa in 1958 — a steady rise with an annual saw-tooth from Northern Hemisphere vegetation."}, {"letter": "p", "text": "Sulfur thrown into the stratosphere by eruptions reflects arriving sunlight and cools the surface for 1–3 years. Mt Pinatubo in 1991 cooled Earth by about 0.5°C."}, {"letter": "q", "text": "Adjusting to the change already underway — restoring coastal wetlands, moving critical infrastructure uphill, training people to evacuate safely."}, {"letter": "r", "text": "Earth's orbit stretches between nearly circular and more elliptical over 100,000–413,000 years, altering how much solar energy arrives at different points in the year."}, {"letter": "s", "text": "Extra CO₂, CH₄ and N₂O from human activity let less re-radiated heat escape to space than the natural balance allowed."}, {"letter": "t", "text": "Annual growth bands. Width separates good years from drought years and wood density tracks seasonal temperature, thousands of years into the past."}, {"letter": "u", "text": "Earth wobbles on its axis like a spinning top over roughly 19,000–26,000 years, shifting which hemisphere receives the strongest summer."}, {"letter": "v", "text": "Cutting greenhouse gas emissions to limit how much climate change happens — decarbonising energy, transport and industry."}, {"letter": "w", "text": "A greenhouse gas made by microbes that break down organic matter where there is no oxygen; also released by livestock and rice paddies."}, {"letter": "x", "text": "Antarctic samples whose trapped air bubbles hold the actual atmosphere of the past, carrying the CO₂ and methane record beyond 800,000 years."}], "answers": {"B1": "r", "B2": "n", "B3": "u", "B4": "p", "B5": "s", "B6": "w", "B7": "m", "B8": "x", "B9": "t", "B10": "o", "B11": "v", "B12": "q"}, "title": "Deck B — Change, Evidence and Response"}], "chain": [{"n": 1, "text": "Chemical weathering of rocks speeds up"}, {"n": 2, "text": "Sea ice and snow cover melt"}, {"n": 3, "text": "The Earth cools back toward equilibrium"}, {"n": 4, "text": "More solar energy is absorbed at the surface"}, {"n": 5, "text": "Weathering removes CO₂ from the atmosphere"}, {"n": 6, "text": "Surface albedo falls"}, {"n": 7, "text": "The original warming is amplified"}, {"n": 8, "text": "The greenhouse effect weakens"}, {"n": 9, "text": "Global temperature rises"}, {"n": 10, "text": "Atmospheric CO₂ rises and the Earth warms"}], "ui": {"title": "Climate Concepts, Loops and Forecasts", "sub": "Solo practice on one device", "r1": "Round 1", "r2": "Round 2", "r3": "Round 3", "r1full": "Match the Cards", "r2full": "Build the Loop", "r3full": "Forecast the Future", "pickDeck": "Choose a deck to start", "deckA": "Deck A · The Climate System", "deckB": "Deck B · Change, Evidence, Response", "pickRole": "What are you holding?", "roleTerm": "I hold the terms", "roleTermSub": "You name the match and say why. You record the answers.", "roleDef": "I read the descriptions", "roleDefSub": "You read each card aloud. Do not show your screen.", "threes": "Group of three? Partner C reads the descriptions for both decks. A holds the terms for Deck A, B for Deck B.", "change": "Change", "holding": "You hold the terms", "reading": "You read the descriptions", "readAloud": "Read this aloud. Say the letter first.", "prev": "Back", "next": "Next", "of": "of", "instructionA": "Your partner reads a card and says its letter. Name the term, give one reason, then set the letter here.", "pick": "—", "check": "Check my answers", "recheck": "Check again", "reveal": "Show correct answers", "scored": "correct out of 12", "tryAgain": "Red cards are wrong. Tap one to try it again, then check again.", "allRight": "All twelve. Try the other deck, then move on to Round 2.", "chainHint": "Tap a card, then tap a slot. The ten cards make two five-step loops. Then choose what kind of loop each one is.", "loop1": "Loop 1", "loop2": "Loop 2", "slotEmpty": "empty", "positive": "Positive feedback", "negative": "Negative feedback", "loopType": "This loop is:", "checkLoops": "Check the loops", "loopsRight": "Both loops correct. Move on to Round 3.", "loopsWrong": "Not yet. A loop is right when each step causes the next one.", "clear": "Clear", "progress": "matched", "answered": "answered", "lang": "ไทย", "whichTerm": "Which term matches this description?", "soloHint": "Read the description, decide which term fits and why, then tap that term.", "answer": "Answer", "notAnswered": "Not answered yet", "startOver": "Start over", "yourMatches": "Your matches", "nameLabel": "Your name and student ID", "sentenceH": "Your feedback sentence", "sentenceHint": "In one sentence, explain how the two loops from Round 2 differ. Don't use the words “good” or “bad”.", "sentencePh": "Write your sentence here.", "badWord": "Your sentence uses “good” or “bad”. Try describing what the loop does instead.", "corrH": "Correct a mistake", "corrHint": "For each card you got wrong on your first check, choose it below and explain in one or two sentences why the correct term fits. At least one is required.", "corrNone": "Check both decks in Round 1 first. Cards you get wrong on the first check will appear here.", "corrAllRight": "You had no mistakes on your first check. Choose any card and explain why the term fits.", "corrPick": "Choose a card", "corr1": "Correction 1", "corr2": "Correction 2 (optional)", "correctIs": "Correct term", "whyPh": "Why does this term fit the description?", "cardTitle": "Completion summary", "cardHint": "Screenshot this summary and submit it.", "noName": "Name missing", "missing": "Not written yet", "firstTry": "First check", "finalScore": "Final", "checksL": "Checks", "revealedL": "Answers shown", "solvedL": "Loops correct", "solvedOn": "Solved on check", "notChecked": "Not checked yet", "yes": "Yes", "no": "No", "segs": ["Deck A", "Deck B", "Loops", "Warming", "Uncertainty"], "stripesCap": "Each part you finish reveals 50 years of warming, 1850–2100.", "stripesAria": "Warming stripes showing progress through five parts", "partsDone": "parts done", "t0": "Guide", "t0full": "How it works", "t4": "Submit", "t4full": "Summary", "corrNotNeeded": "Not needed. Every card was right on the first check.", "captureBig": "Capture this box and submit it", "captureSmall": "Take one screenshot of everything inside this box and send it to your instructor.", "scrollNote": "Fill in the three sections below. Your summary to capture is at the bottom of this page.", "partA": "Part A", "partB": "Part B", "inRange": "inside the IPCC range", "fcUnset": "not set", "fcIpcc": "IPCC AR6", "gTitle": "How to complete this activity", "gIntro": "You'll work through three rounds on your own, then submit a summary. Your progress saves on this device and browser, so finish on the same one.", "gSteps": [["Round 1: match Deck A", "Read each description and decide which term fits it. Be ready to give one reason for each choice, then tap the term. Answer all 12 cards, then tap Check my answers."], ["Fix mistakes, then do Deck B", "Red cards are wrong. Tap one, try again, and check again. Then switch to Deck B and repeat."], ["Round 2: build the loops", "Arrange the ten cards into two five-step loops so that each step causes the next. Mark each loop as positive or negative feedback, then check."], ["Round 3: forecast the future", "Estimate how much the world will warm by 2100 under five emissions scenarios, then answer five questions about forecast uncertainty."], ["Review your summary", "Open the Submit tab and enter your name and student ID. Your results appear in a box, with the key takeaways from each round underneath for review."], ["Capture and send", "Take a screenshot of the results box and send it to your instructor."]], "gKnowH": "Good to know", "gKnow": ["Your first check in each round is recorded and can't be undone, so take your time before checking.", "If you tap Show correct answers, the summary will show it.", "You can switch between English and Thai at any time. Your answers stay."], "gStart": "Start Round 1", "fc": {"ssp": [{"story": "Sustainability, very low emissions", "text": "Society shifts quickly to clean energy and less wasteful consumption. CO₂ emissions reach net zero around 2050, then fall below zero as CO₂ is removed from the air. This is the only pathway designed to keep warming close to 1.5 °C."}, {"story": "Sustainability, low emissions", "text": "The same sustainable storyline, but emissions fall more slowly. CO₂ reaches net zero in the second half of the century. This pathway is designed to keep warming below 2 °C, the upper goal of the Paris Agreement."}, {"story": "Middle of the road", "text": "Social, economic and technology trends roughly follow past patterns. Emissions stay near today's level until about 2050, then decline but do not reach net zero by 2100. It sits roughly where today's national policies are heading."}, {"story": "Regional rivalry", "text": "Countries focus on national security and their own development, and international cooperation weakens. Emissions roughly double by 2100, and air pollution also stays high."}, {"story": "Fossil-fuelled development", "text": "Fast economic growth powered by abundant coal, oil and gas. Emissions roughly double by 2050. Many scientists now see this as an unlikely worst case, but it is useful for studying high-risk outcomes."}], "nameH": "How to read a scenario name", "nameP": "SSP stands for Shared Socioeconomic Pathway. The first number (1–5) is the storyline of how society develops. The number after the dash is how much extra energy the atmosphere traps in 2100, in watts per square metre (W/m²). A bigger second number means more warming.", "aTitle": "How warm by 2100?", "aIntro": "For each scenario, estimate how much warmer 2081–2100 will be than 1850–1900. For reference, 2011–2020 was already about 1.1 °C warmer. Read about each scenario, move every slider, then check. You get one check.", "aMissing": "Move all five sliders before checking.", "aTake": "The green band is the IPCC very likely range and the line is its best estimate. Even the lowest scenario ends warmer than today, and the gap between the lowest and highest scenarios is larger than the range within any single one. Which path we take matters more than anything else.", "bTitle": "Where does forecast uncertainty come from?", "bIntro": "Choose one answer for each question, then check. You can change answers and check again.", "bMissing": "Answer all five questions before checking.", "tryOther": "Not quite. Try another option.", "bAll": "All five. You're ready to submit.", "bTry": "Change the red answers and check again.", "q": [{"t": "A forecast of global average temperature for the next few years. Which source of uncertainty is largest?", "o": ["Natural variability, such as El Niño and La Niña", "Differences between climate models", "Which emissions path humanity follows"], "e": "Over a few years, natural swings like El Niño can move global temperature by a few tenths of a degree, more than the slow warming trend adds in that time."}, {"t": "A projection for the 2040s. Which source of uncertainty is largest?", "o": ["Natural variability, such as El Niño and La Niña", "Differences between climate models", "Which emissions path humanity follows"], "e": "By mid-century the warming trend dominates, but models still disagree on how strongly the climate responds to added CO₂. The scenarios haven't yet pulled far apart."}, {"t": "A projection for the 2090s. Which source of uncertainty is largest?", "o": ["Natural variability, such as El Niño and La Niña", "Differences between climate models", "Which emissions path humanity follows"], "e": "By the end of the century the scenarios are about 3 °C apart. What we emit decides more than which model we use."}, {"t": "Weather forecasts lose skill after about ten days. Why can scientists still project the climate of 2100?", "o": ["Projections estimate long-term averages set by Earth's energy balance, not the weather on a particular day.", "Climate models are far more detailed than weather models.", "Projections run weather models for longer and correct them with satellite data."], "e": "It's like knowing the rainy season will be wetter than the dry season without knowing whether it rains next Tuesday. This is the weather–climate difference from Round 1."}, {"t": "Why does the IPCC call its 2100 numbers projections rather than predictions?", "o": ["They depend on an assumed emissions path: “if we follow this path, then…”", "The models aren't accurate enough to be called predictions.", "They only apply to some regions of the world."], "e": "A projection is conditional on a scenario. Future human choices are not something a physical model can predict."}]}, "keyTake": "Key takeaways", "bAll": "All five. Open the Submit tab to see your summary.", "take1": ["Weather is what you get; climate is what you expect, the 30-year average. The climate system links the atmosphere, hydrosphere, cryosphere, lithosphere and biosphere.", "The tropics gain more energy than they lose and the poles lose more than they gain, so winds and ocean currents carry heat poleward. Surface albedo controls how much sunlight is absorbed.", "Climate has always changed for natural reasons, such as orbital cycles over tens of thousands of years and volcanic eruptions that cool the planet for a few years. Today's rapid warming comes from the enhanced greenhouse effect.", "Ice cores, tree rings and the Keeling Curve are evidence of past and present change. Mitigation cuts emissions to limit change; adaptation adjusts to the change already happening. Both are needed."], "take2": ["Positive feedback amplifies a change: warming melts ice, albedo falls, more sunlight is absorbed, and warming grows.", "Negative feedback opposes a change: warming speeds up rock weathering, which removes CO₂ from the air and cools the Earth.", "The two loops run on very different timescales. Ice–albedo feedback acts within decades, while weathering takes hundreds of thousands of years, so it cannot offset human-caused warming in our lifetimes."], "take3": ["How much the world warms by 2100 depends mostly on emissions: from about 1.4 °C under very low emissions to about 4.4 °C under very high emissions.", "The main source of uncertainty shifts over time: natural variability in the next few years, differences between models around mid-century, and human choices by the end of the century.", "Climate projections are conditional: “if we follow this path, then…”. They estimate long-term averages, which is why climate can be projected decades ahead even though weather can't be forecast beyond about ten days."], "nameOnly": "Name", "sidLabel": "Student ID", "noId": "missing", "keyTakeH": "Key takeaways", "keyTakeSub": "The main ideas from each round, for review. You don't need to include this in your screenshot."}, "loops": {"pos": [9, 2, 6, 4, 7], "neg": [10, 1, 5, 8, 3]}}, "th": {"decks": [{"terms": [{"id": "A1", "text": "Weather"}, {"id": "A2", "text": "Climate"}, {"id": "A3", "text": "Energy surplus & deficit"}, {"id": "A4", "text": "Albedo"}, {"id": "A5", "text": "Positive feedback"}, {"id": "A6", "text": "Negative feedback"}, {"id": "A7", "text": "Troposphere"}, {"id": "A8", "text": "Stratosphere"}, {"id": "A9", "text": "Lithosphere"}, {"id": "A10", "text": "Hydrosphere"}, {"id": "A11", "text": "Biosphere"}, {"id": "A12", "text": "Cryosphere"}], "defs": [{"letter": "a", "text": "วงจรที่ขยายการเปลี่ยนแปลงตั้งต้นให้รุนแรงขึ้น เมื่ออุณหภูมิสูงขึ้น น้ำแข็งละลาย ค่าการสะท้อนแสงลดลง พื้นผิวจึงดูดกลืนพลังงานมากขึ้น และยิ่งอุ่นขึ้นไปอีก"}, {"letter": "b", "text": "สิ่งมีชีวิตทั้งหมดบนโลก รวมถึงปฏิสัมพันธ์ของสิ่งมีชีวิตเหล่านั้นกับพื้นดิน แหล่งน้ำ และอากาศ"}, {"letter": "c", "text": "ค่าเฉลี่ยของสภาพอากาศในรอบ 30 ปี ของพื้นที่ใดพื้นที่หนึ่ง คือสิ่งที่เรา <strong>คาดหวัง</strong> ว่าจะเจอ"}, {"letter": "d", "text": "ช่วงความสูง 12–50 กิโลเมตร เป็นที่ตั้งของชั้นโอโซน อุณหภูมิสูงขึ้นตามความสูง เพราะโอโซนดูดกลืนรังสีอัลตราไวโอเลต"}, {"letter": "e", "text": "ส่วนของโลกที่อยู่ในสภาพเยือกแข็ง ได้แก่ ธารน้ำแข็ง น้ำแข็งทะเล พืดน้ำแข็ง หิมะปกคลุม และชั้นดินเยือกแข็งคงตัว"}, {"letter": "f", "text": "สภาวะของบรรยากาศ ณ สถานที่หนึ่งในช่วงเวลาสั้น ๆ เช่น ฝน หมอก พายุ หรือลมในวันนี้ คือสิ่งที่เรา <strong>เจอจริง</strong>"}, {"letter": "g", "text": "เปลือกแข็งชั้นนอกสุดของโลก ประกอบด้วยเปลือกโลกและเนื้อโลกส่วนบนสุด ลึกลงไปราว 100 กิโลเมตร เกี่ยวข้องกับการผุพัง การเกิดดิน และวัฏจักรคาร์บอนระยะยาว"}, {"letter": "h", "text": "ความสามารถในการสะท้อนแสงของพื้นผิว หิมะและน้ำแข็งสะท้อนแสงที่ตกกระทบกลับไป 70–90% ขณะที่พื้นดินเปล่าและผิวน้ำดูดกลืนไว้ราว 90%"}, {"letter": "i", "text": "ช่วงความสูง 0–12 กิโลเมตร มีมวลราว 75% ของบรรยากาศทั้งหมดและไอน้ำเกือบทั้งหมด อุณหภูมิลดลงตามความสูง และปรากฏการณ์ลมฟ้าอากาศเกิดขึ้นที่ชั้นนี้"}, {"letter": "j", "text": "เขตร้อนดูดกลืนพลังงานจากดวงอาทิตย์มากกว่าที่แผ่ออก ส่วนเขตขั้วโลกแผ่รังสีคลื่นยาวออกมากกว่าที่ได้รับ บรรยากาศและมหาสมุทรทำหน้าที่ขนส่วนต่างนี้ไปยังขั้วโลก"}, {"letter": "k", "text": "น้ำทั้งหมดบนโลก ซึ่งหมุนเวียนอย่างต่อเนื่องผ่านการระเหย การควบแน่น การตกของหยาดน้ำฟ้า และการรวมตัวกลับสู่แหล่งน้ำ"}, {"letter": "l", "text": "วงจรที่ต้านการเปลี่ยนแปลงตั้งต้น เมื่ออุณหภูมิสูงขึ้น การผุพังทางเคมีของหินเกิดเร็วขึ้น การผุพังดึง CO₂ ออกจากบรรยากาศ โลกจึงเย็นลงกลับสู่สมดุล"}], "answers": {"A1": "f", "A2": "c", "A3": "j", "A4": "h", "A5": "a", "A6": "l", "A7": "i", "A8": "d", "A9": "g", "A10": "k", "A11": "b", "A12": "e"}, "title": "ชุด A — ระบบภูมิอากาศ"}, {"terms": [{"id": "B1", "text": "Eccentricity"}, {"id": "B2", "text": "Obliquity"}, {"id": "B3", "text": "Precession"}, {"id": "B4", "text": "Volcanic aerosols"}, {"id": "B5", "text": "Enhanced greenhouse effect"}, {"id": "B6", "text": "Methane (CH₄)"}, {"id": "B7", "text": "Global warming potential"}, {"id": "B8", "text": "Ice cores"}, {"id": "B9", "text": "Tree rings"}, {"id": "B10", "text": "The Keeling Curve"}, {"id": "B11", "text": "Mitigation"}, {"id": "B12", "text": "Adaptation"}], "defs": [{"letter": "m", "text": "ภาวะโลกร้อนที่เกิดจากการปล่อยก๊าซชนิดหนึ่งหนึ่งครั้ง เทียบกับ CO₂ มวลเท่ากัน ในกรอบเวลาที่กำหนด กรณีมีเทนมีค่า 86 ในกรอบ 20 ปี แต่เหลือเพียง 34 ในกรอบ 100 ปี"}, {"letter": "n", "text": "แกนหมุนของโลกเอียงเปลี่ยนไปมาระหว่าง 21.1° ถึง 24.5° ในรอบราว 41,000 ปี ทำให้ความรุนแรงของฤดูกาลเปลี่ยนไป ปัจจุบันอยู่ที่ 23.5°"}, {"letter": "o", "text": "ข้อมูลความเข้มข้น CO₂ ที่ ชาลส์ คีลลิง เริ่มวัดที่หอสังเกตการณ์เมานาโลอา ในปี ค.ศ. 1958 เป็นแนวโน้มเพิ่มขึ้นที่มีลักษณะฟันเลื่อยรายปีจากพืชพรรณในซีกโลกเหนือ"}, {"letter": "p", "text": "กำมะถันที่การปะทุพ่นขึ้นสู่ชั้นสตราโตสเฟียร์สะท้อนแสงอาทิตย์ที่ตกกระทบ และทำให้พื้นผิวเย็นลงนาน 1–3 ปี ภูเขาไฟปินาตูโบ ปี ค.ศ. 1991 ทำให้โลกเย็นลงราว 0.5°C"}, {"letter": "q", "text": "การปรับตัวต่อการเปลี่ยนแปลงที่เกิดขึ้นแล้ว เช่น ฟื้นฟูพื้นที่ชุ่มน้ำชายฝั่ง ย้ายโครงสร้างพื้นฐานสำคัญขึ้นที่สูง และฝึกอบรมประชาชนให้อพยพได้อย่างปลอดภัย"}, {"letter": "r", "text": "วงโคจรของโลกยืดหดระหว่างเกือบเป็นวงกลมกับเป็นวงรีมากขึ้น ในรอบ 100,000–413,000 ปี ทำให้พลังงานจากดวงอาทิตย์ที่ได้รับในแต่ละช่วงของปีเปลี่ยนไป"}, {"letter": "s", "text": "CO₂ CH₄ และ N₂O ส่วนเกินจากกิจกรรมของมนุษย์ ทำให้ความร้อนที่แผ่กลับออกไปหลุดสู่อวกาศได้น้อยลงกว่าสมดุลตามธรรมชาติ"}, {"letter": "t", "text": "วงการเจริญเติบโตรายปี ความกว้างของวงแยกปีที่สภาพเอื้ออำนวยออกจากปีแล้ง และความหนาแน่นของเนื้อไม้บอกอุณหภูมิตามฤดูกาล ย้อนหลังได้หลายพันปี"}, {"letter": "u", "text": "โลกส่ายรอบแกนหมุนคล้ายลูกข่าง ในรอบราว 19,000–26,000 ปี ทำให้ซีกโลกที่ได้รับฤดูร้อนรุนแรงที่สุดสลับเปลี่ยนไป"}, {"letter": "v", "text": "การลดการปล่อยก๊าซเรือนกระจกเพื่อจำกัดขนาดของการเปลี่ยนแปลงสภาพภูมิอากาศที่จะเกิดขึ้น เช่น การลดคาร์บอนในภาคพลังงาน ขนส่ง และอุตสาหกรรม"}, {"letter": "w", "text": "ก๊าซเรือนกระจกที่เกิดจากจุลินทรีย์ย่อยสลายอินทรียวัตถุในสภาวะไร้ออกซิเจน และยังปล่อยออกจากปศุสัตว์และนาข้าว"}, {"letter": "x", "text": "แท่งน้ำแข็งจากแอนตาร์กติกา ซึ่งมีฟองอากาศที่กักเก็บบรรยากาศในอดีตไว้จริง ทำให้ข้อมูล CO₂ และมีเทนย้อนกลับไปได้เกิน 800,000 ปี"}], "answers": {"B1": "r", "B2": "n", "B3": "u", "B4": "p", "B5": "s", "B6": "w", "B7": "m", "B8": "x", "B9": "t", "B10": "o", "B11": "v", "B12": "q"}, "title": "ชุด B — การเปลี่ยนแปลง หลักฐาน และการรับมือ"}], "chain": [{"n": 1, "text": "การผุพังทางเคมีของหินเกิดเร็วขึ้น"}, {"n": 2, "text": "น้ำแข็งทะเลและหิมะปกคลุมละลาย"}, {"n": 3, "text": "โลกเย็นลงกลับสู่สมดุล"}, {"n": 4, "text": "พื้นผิวดูดกลืนพลังงานจากดวงอาทิตย์มากขึ้น"}, {"n": 5, "text": "การผุพังดึง CO₂ ออกจากบรรยากาศ"}, {"n": 6, "text": "ค่าการสะท้อนแสงของพื้นผิวลดลง"}, {"n": 7, "text": "ภาวะอุ่นขึ้นตั้งต้นถูกขยายให้รุนแรงขึ้น"}, {"n": 8, "text": "ปรากฏการณ์เรือนกระจกอ่อนกำลังลง"}, {"n": 9, "text": "อุณหภูมิเฉลี่ยของโลกสูงขึ้น"}, {"n": 10, "text": "CO₂ ในบรรยากาศเพิ่มขึ้นและโลกอุ่นขึ้น"}], "ui": {"title": "แนวคิด วงจรป้อนกลับ และการพยากรณ์ภูมิอากาศ", "sub": "ฝึกด้วยตัวเองบนเครื่องเดียว", "r1": "รอบที่ 1", "r2": "รอบที่ 2", "r3": "รอบที่ 3", "r1full": "จับคู่การ์ด", "r2full": "ต่อวงจรให้ครบ", "r3full": "พยากรณ์อนาคต", "pickDeck": "เลือกชุดการ์ดเพื่อเริ่ม", "deckA": "ชุด A · ระบบภูมิอากาศ", "deckB": "ชุด B · การเปลี่ยนแปลง หลักฐาน การรับมือ", "pickRole": "คุณถือการ์ดแบบไหน", "roleTerm": "ฉันถือการ์ดคำศัพท์", "roleTermSub": "คุณเป็นคนบอกคำตอบพร้อมเหตุผล และเป็นคนบันทึกคำตอบ", "roleDef": "ฉันอ่านการ์ดคำอธิบาย", "roleDefSub": "คุณอ่านการ์ดออกเสียงทีละใบ ห้ามให้คู่ของคุณเห็นหน้าจอ", "threes": "กลุ่มสามคน: นิสิต C อ่านการ์ดคำอธิบายทั้งสองชุด นิสิต A ถือคำศัพท์ชุด A และนิสิต B ถือคำศัพท์ชุด B", "change": "เปลี่ยน", "holding": "คุณถือการ์ดคำศัพท์", "reading": "คุณอ่านการ์ดคำอธิบาย", "readAloud": "อ่านออกเสียง โดยบอกตัวอักษรก่อน", "prev": "ก่อนหน้า", "next": "ถัดไป", "of": "จาก", "instructionA": "คู่ของคุณจะอ่านการ์ดและบอกตัวอักษร ให้คุณบอกศัพท์ที่ตรงกันพร้อมเหตุผลหนึ่งข้อ แล้วจึงเลือกตัวอักษรที่นี่", "pick": "—", "check": "ตรวจคำตอบ", "recheck": "ตรวจอีกครั้ง", "reveal": "แสดงเฉลย", "scored": "ข้อ จาก 12", "tryAgain": "การ์ดสีแดงคือข้อที่ยังไม่ถูก แตะเพื่อลองใหม่ แล้วตรวจอีกครั้ง", "allRight": "ถูกทั้งสิบสองข้อ ลองอีกชุด แล้วไปต่อรอบที่ 2", "chainHint": "แตะการ์ดหนึ่งใบ แล้วแตะช่องที่ต้องการวาง การ์ดสิบใบประกอบเป็นวงจรสองวง วงละห้าขั้น จากนั้นเลือกว่าแต่ละวงเป็นการป้อนกลับแบบใด", "loop1": "วงจรที่ 1", "loop2": "วงจรที่ 2", "slotEmpty": "ว่าง", "positive": "การป้อนกลับเชิงบวก", "negative": "การป้อนกลับเชิงลบ", "loopType": "วงจรนี้คือ:", "checkLoops": "ตรวจวงจร", "loopsRight": "ถูกต้องทั้งสองวง ไปต่อรอบที่ 3 ได้เลย", "loopsWrong": "ยังไม่ถูก วงจรจะถูกต่อเมื่อแต่ละขั้นเป็นเหตุให้เกิดขั้นถัดไป", "clear": "ล้าง", "progress": "คู่ที่จับได้", "answered": "ตอบแล้ว", "lang": "EN", "whichTerm": "ศัพท์ใดตรงกับคำอธิบายนี้", "soloHint": "อ่านคำอธิบาย คิดว่าศัพท์ใดตรงกันและเพราะอะไร แล้วแตะศัพท์นั้น", "answer": "เฉลย", "notAnswered": "ยังไม่ได้ตอบ", "startOver": "เริ่มใหม่", "yourMatches": "คู่ที่คุณจับ", "nameLabel": "ชื่อและรหัสนิสิต", "sentenceH": "ประโยคเรื่องการป้อนกลับของคุณ", "sentenceHint": "อธิบายในหนึ่งประโยคว่าวงจรสองวงในรอบที่ 2 ต่างกันอย่างไร ห้ามใช้คำว่า “ดี” หรือ “แย่”", "sentencePh": "เขียนประโยคของคุณที่นี่", "badWord": "ประโยคของคุณมีคำว่า “แย่” ลองอธิบายว่าวงจรทำอะไรแทน", "corrH": "แก้ไขข้อที่ผิด", "corrHint": "สำหรับการ์ดแต่ละใบที่ตอบผิดในการตรวจครั้งแรก ให้เลือกการ์ดด้านล่าง แล้วอธิบายหนึ่งถึงสองประโยคว่าทำไมศัพท์ที่ถูกต้องจึงตรงกับคำอธิบาย ต้องทำอย่างน้อยหนึ่งข้อ", "corrNone": "ตรวจคำตอบทั้งสองชุดในรอบที่ 1 ก่อน การ์ดที่ตอบผิดในการตรวจครั้งแรกจะปรากฏที่นี่", "corrAllRight": "คุณไม่มีข้อผิดในการตรวจครั้งแรก เลือกการ์ดใดก็ได้แล้วอธิบายว่าทำไมศัพท์นั้นจึงตรงกัน", "corrPick": "เลือกการ์ด", "corr1": "ข้อแก้ไขที่ 1", "corr2": "ข้อแก้ไขที่ 2 (ไม่บังคับ)", "correctIs": "ศัพท์ที่ถูกต้อง", "whyPh": "ทำไมศัพท์นี้จึงตรงกับคำอธิบาย", "cardTitle": "สรุปการทำกิจกรรม", "cardHint": "แคปหน้าจอสรุปนี้แล้วส่งให้อาจารย์", "noName": "ยังไม่ได้ใส่ชื่อ", "missing": "ยังไม่ได้เขียน", "firstTry": "ตรวจครั้งแรก", "finalScore": "คะแนนสุดท้าย", "checksL": "จำนวนครั้งที่ตรวจ", "revealedL": "ดูเฉลย", "solvedL": "วงจรถูกต้อง", "solvedOn": "ถูกในการตรวจครั้งที่", "notChecked": "ยังไม่ได้ตรวจ", "yes": "ใช่", "no": "ไม่", "segs": ["ชุด A", "ชุด B", "วงจร", "โลกร้อน", "ความไม่แน่นอน"], "stripesCap": "ทำเสร็จแต่ละส่วน จะเปิดแถบภาวะโลกร้อนช่วงละ 50 ปี ตั้งแต่ ค.ศ. 1850–2100", "stripesAria": "แถบสีภาวะโลกร้อนแสดงความคืบหน้าห้าส่วน", "partsDone": "ส่วนที่เสร็จ", "t0": "คำแนะนำ", "t0full": "วิธีทำกิจกรรม", "t4": "ส่งงาน", "t4full": "สรุป", "corrNotNeeded": "ไม่ต้องทำ เพราะตอบถูกทุกใบตั้งแต่การตรวจครั้งแรก", "captureBig": "แคปหน้าจอกรอบนี้แล้วส่งงาน", "captureSmall": "แคปหน้าจอทุกอย่างในกรอบนี้แล้วส่งให้อาจารย์", "scrollNote": "กรอกข้อมูลสามส่วนด้านล่าง สรุปสำหรับแคปหน้าจออยู่ท้ายหน้านี้", "partA": "ส่วน A", "partB": "ส่วน B", "inRange": "อยู่ในช่วงของ IPCC", "fcUnset": "ยังไม่ได้เลือก", "fcIpcc": "IPCC AR6", "gTitle": "วิธีทำกิจกรรมนี้", "gIntro": "คุณจะทำกิจกรรมสามรอบด้วยตัวเอง แล้วส่งสรุปผล ความคืบหน้าจะบันทึกไว้ในเครื่องและเบราว์เซอร์นี้ จึงควรทำให้เสร็จบนเครื่องเดียวกัน", "gSteps": [["รอบที่ 1: จับคู่ชุด A", "อ่านคำอธิบายแต่ละใบ แล้วคิดว่าศัพท์ใดตรงกัน โดยให้มีเหตุผลหนึ่งข้อสำหรับแต่ละคำตอบ แล้วแตะคำศัพท์นั้น ตอบให้ครบ 12 ใบ แล้วแตะ ตรวจคำตอบ"], ["แก้ข้อที่ผิด แล้วทำชุด B", "การ์ดสีแดงคือข้อที่ผิด แตะเพื่อลองใหม่ แล้วตรวจอีกครั้ง จากนั้นเปลี่ยนเป็นชุด B แล้วทำแบบเดียวกัน"], ["รอบที่ 2: ต่อวงจร", "เรียงการ์ดสิบใบเป็นวงจรสองวง วงละห้าขั้น ให้แต่ละขั้นเป็นเหตุของขั้นถัดไป เลือกว่าแต่ละวงเป็นการป้อนกลับเชิงบวกหรือเชิงลบ แล้วตรวจ"], ["รอบที่ 3: พยากรณ์อนาคต", "ประมาณว่าโลกจะร้อนขึ้นเท่าใดภายในปี ค.ศ. 2100 ภายใต้ฉากทัศน์การปล่อยก๊าซห้าแบบ แล้วตอบคำถามห้าข้อเรื่องความไม่แน่นอนของการพยากรณ์"], ["ดูสรุปของคุณ", "เปิดแท็บส่งงานแล้วใส่ชื่อและรหัสนิสิต ผลของคุณจะแสดงในกรอบ และมีประเด็นสำคัญของแต่ละรอบอยู่ด้านล่างไว้ทบทวน"], ["แคปหน้าจอและส่ง", "แคปหน้าจอกรอบผลการทำกิจกรรม แล้วส่งให้อาจารย์"]], "gKnowH": "ควรรู้", "gKnow": ["ผลการตรวจครั้งแรกของแต่ละรอบจะถูกบันทึกและย้อนกลับไม่ได้ จึงควรคิดให้รอบคอบก่อนตรวจ", "หากแตะ แสดงเฉลย สรุปผลจะแสดงไว้ด้วย", "สลับภาษาไทยและอังกฤษได้ตลอดเวลา คำตอบจะยังอยู่"], "gStart": "เริ่มรอบที่ 1", "fc": {"ssp": [{"story": "ความยั่งยืน ปล่อยก๊าซต่ำมาก", "text": "สังคมเปลี่ยนไปใช้พลังงานสะอาดและบริโภคอย่างประหยัดอย่างรวดเร็ว การปล่อย CO₂ สุทธิเป็นศูนย์ราวปี ค.ศ. 2050 แล้วติดลบเมื่อมีการดึง CO₂ ออกจากอากาศ เป็นเส้นทางเดียวที่ออกแบบให้ภาวะโลกร้อนอยู่ใกล้ 1.5 °C"}, {"story": "ความยั่งยืน ปล่อยก๊าซต่ำ", "text": "เรื่องราวความยั่งยืนแบบเดียวกัน แต่ลดการปล่อยช้ากว่า CO₂ สุทธิเป็นศูนย์ในครึ่งหลังของศตวรรษ ออกแบบให้ภาวะโลกร้อนต่ำกว่า 2 °C ซึ่งเป็นเป้าหมายขั้นสูงของความตกลงปารีส"}, {"story": "ทางสายกลาง", "text": "แนวโน้มทางสังคม เศรษฐกิจ และเทคโนโลยีเป็นไปตามรูปแบบในอดีต การปล่อยคงอยู่ใกล้ระดับปัจจุบันจนถึงราวปี ค.ศ. 2050 แล้วลดลง แต่ไม่ถึงศูนย์สุทธิภายในปี ค.ศ. 2100 ใกล้เคียงกับทิศทางของนโยบายของประเทศต่าง ๆ ในปัจจุบัน"}, {"story": "การแข่งขันระหว่างภูมิภาค", "text": "ประเทศต่าง ๆ มุ่งเน้นความมั่นคงและการพัฒนาของตนเอง ความร่วมมือระหว่างประเทศอ่อนแอลง การปล่อยเพิ่มขึ้นราวสองเท่าภายในปี ค.ศ. 2100 และมลพิษทางอากาศยังคงสูง"}, {"story": "การพัฒนาที่พึ่งพาเชื้อเพลิงฟอสซิล", "text": "เศรษฐกิจเติบโตเร็วด้วยถ่านหิน น้ำมัน และก๊าซธรรมชาติจำนวนมาก การปล่อยเพิ่มขึ้นราวสองเท่าภายในปี ค.ศ. 2050 ปัจจุบันนักวิทยาศาสตร์จำนวนมากมองว่าเป็นกรณีเลวร้ายที่มีโอกาสเกิดน้อย แต่มีประโยชน์ในการศึกษาผลกระทบที่มีความเสี่ยงสูง"}], "nameH": "วิธีอ่านชื่อฉากทัศน์", "nameP": "SSP ย่อมาจาก Shared Socioeconomic Pathway (เส้นทางเศรษฐกิจและสังคมร่วม) ตัวเลขแรก (1–5) คือเรื่องราวการพัฒนาของสังคม ตัวเลขหลังขีดคือพลังงานส่วนเกินที่บรรยากาศกักเก็บไว้ในปี ค.ศ. 2100 หน่วยวัตต์ต่อตารางเมตร (W/m²) ตัวเลขยิ่งมาก โลกยิ่งร้อนขึ้น", "aTitle": "ภายในปี 2100 โลกจะร้อนขึ้นเท่าใด", "aIntro": "ประมาณว่าช่วงปี ค.ศ. 2081–2100 จะร้อนกว่าช่วง ค.ศ. 1850–1900 เท่าใด สำหรับแต่ละฉากทัศน์ เพื่อเป็นจุดอ้างอิง ช่วง ค.ศ. 2011–2020 ร้อนขึ้นแล้วราว 1.1 °C อ่านคำอธิบายฉากทัศน์ เลื่อนแถบให้ครบทุกแถบแล้วตรวจ ตรวจได้ครั้งเดียว", "aMissing": "เลื่อนแถบให้ครบทั้งห้าแถบก่อนตรวจ", "aTake": "แถบสีเขียวคือช่วงที่เป็นไปได้มากของ IPCC และเส้นคือค่าประมาณที่ดีที่สุด แม้ฉากทัศน์ต่ำสุดก็ยังร้อนกว่าปัจจุบัน และความต่างระหว่างฉากทัศน์ต่ำสุดกับสูงสุดมากกว่าช่วงภายในฉากทัศน์ใดฉากทัศน์หนึ่ง เส้นทางที่เราเลือกจึงสำคัญที่สุด", "bTitle": "ความไม่แน่นอนของการพยากรณ์มาจากไหน", "bIntro": "เลือกคำตอบหนึ่งข้อในแต่ละคำถาม แล้วตรวจ เปลี่ยนคำตอบและตรวจใหม่ได้", "bMissing": "ตอบให้ครบทั้งห้าข้อก่อนตรวจ", "tryOther": "ยังไม่ถูก ลองตัวเลือกอื่น", "bAll": "ถูกทั้งห้าข้อ พร้อมส่งงานแล้ว", "bTry": "เปลี่ยนคำตอบที่ขึ้นสีแดงแล้วตรวจอีกครั้ง", "q": [{"t": "การพยากรณ์อุณหภูมิเฉลี่ยโลกในอีกไม่กี่ปีข้างหน้า แหล่งความไม่แน่นอนใดมากที่สุด", "o": ["ความแปรปรวนตามธรรมชาติ เช่น เอลนีโญและลานีญา", "ความแตกต่างระหว่างแบบจำลองภูมิอากาศ", "เส้นทางการปล่อยก๊าซที่มนุษย์เลือก"], "e": "ในช่วงไม่กี่ปี ความแปรปรวนตามธรรมชาติอย่างเอลนีโญทำให้อุณหภูมิโลกเปลี่ยนได้หลายทศนิยมขององศา มากกว่าแนวโน้มโลกร้อนที่เพิ่มขึ้นช้า ๆ ในช่วงเวลาเดียวกัน"}, {"t": "การคาดการณ์สำหรับทศวรรษ 2040 แหล่งความไม่แน่นอนใดมากที่สุด", "o": ["ความแปรปรวนตามธรรมชาติ เช่น เอลนีโญและลานีญา", "ความแตกต่างระหว่างแบบจำลองภูมิอากาศ", "เส้นทางการปล่อยก๊าซที่มนุษย์เลือก"], "e": "ช่วงกลางศตวรรษแนวโน้มโลกร้อนชัดเจนแล้ว แต่แบบจำลองยังเห็นต่างกันว่าภูมิอากาศตอบสนองต่อ CO₂ ที่เพิ่มขึ้นแรงเพียงใด ขณะที่ฉากทัศน์ต่าง ๆ ยังไม่แยกห่างกันมาก"}, {"t": "การคาดการณ์สำหรับทศวรรษ 2090 แหล่งความไม่แน่นอนใดมากที่สุด", "o": ["ความแปรปรวนตามธรรมชาติ เช่น เอลนีโญและลานีญา", "ความแตกต่างระหว่างแบบจำลองภูมิอากาศ", "เส้นทางการปล่อยก๊าซที่มนุษย์เลือก"], "e": "ปลายศตวรรษ ฉากทัศน์ต่าง ๆ ห่างกันราว 3 °C ปริมาณที่เราปล่อยจึงกำหนดผลมากกว่าแบบจำลองที่เลือกใช้"}, {"t": "การพยากรณ์อากาศแม่นยำได้เพียงราวสิบวัน แล้วทำไมนักวิทยาศาสตร์ยังคาดการณ์ภูมิอากาศปี 2100 ได้", "o": ["การคาดการณ์ประมาณค่าเฉลี่ยระยะยาวที่กำหนดโดยสมดุลพลังงานของโลก ไม่ใช่สภาพอากาศของวันใดวันหนึ่ง", "แบบจำลองภูมิอากาศละเอียดกว่าแบบจำลองพยากรณ์อากาศมาก", "การคาดการณ์คือการรันแบบจำลองพยากรณ์อากาศให้นานขึ้นแล้วปรับแก้ด้วยข้อมูลดาวเทียม"], "e": "เหมือนที่เรารู้ว่าฤดูฝนจะมีฝนมากกว่าฤดูแล้ง โดยไม่ต้องรู้ว่าวันอังคารหน้าฝนจะตกหรือไม่ นี่คือความแตกต่างระหว่างลมฟ้าอากาศกับภูมิอากาศจากรอบที่ 1"}, {"t": "ทำไม IPCC จึงเรียกตัวเลขปี 2100 ว่าการคาดการณ์ (projection) แทนการพยากรณ์ (prediction)", "o": ["เพราะขึ้นอยู่กับเส้นทางการปล่อยก๊าซที่สมมติไว้ คือ “ถ้าเราเดินตามเส้นทางนี้ ผลจะเป็น…”", "เพราะแบบจำลองยังไม่แม่นยำพอจะเรียกว่าการพยากรณ์", "เพราะใช้ได้กับบางภูมิภาคของโลกเท่านั้น"], "e": "การคาดการณ์มีเงื่อนไขขึ้นกับฉากทัศน์ การตัดสินใจของมนุษย์ในอนาคตไม่ใช่สิ่งที่แบบจำลองทางกายภาพจะพยากรณ์ได้"}]}, "keyTake": "ประเด็นสำคัญ", "bAll": "ถูกทั้งห้าข้อ เปิดแท็บส่งงานเพื่อดูสรุปของคุณ", "take1": ["ลมฟ้าอากาศคือสิ่งที่เราเจอจริง ภูมิอากาศคือสิ่งที่เราคาดหวัง หรือค่าเฉลี่ยในรอบ 30 ปี ระบบภูมิอากาศเชื่อมโยงบรรยากาศ อุทกภาค เยือกแข็งภาค ธรณีภาค และชีวภาคเข้าด้วยกัน", "เขตร้อนได้รับพลังงานมากกว่าที่สูญเสีย ส่วนขั้วโลกสูญเสียมากกว่าที่ได้รับ ลมและกระแสน้ำในมหาสมุทรจึงพาความร้อนไปยังขั้วโลก ค่าการสะท้อนแสงของพื้นผิวกำหนดว่าแสงอาทิตย์ถูกดูดกลืนมากเพียงใด", "ภูมิอากาศเปลี่ยนแปลงตามธรรมชาติมาโดยตลอด เช่น วัฏจักรวงโคจรในรอบหลายหมื่นปี และการปะทุของภูเขาไฟที่ทำให้โลกเย็นลงไม่กี่ปี แต่ภาวะโลกร้อนอย่างรวดเร็วในปัจจุบันมาจากปรากฏการณ์เรือนกระจกที่เพิ่มขึ้น", "แท่งน้ำแข็ง วงปีไม้ และเส้นโค้งคีลลิงเป็นหลักฐานของการเปลี่ยนแปลงในอดีตและปัจจุบัน การลดผลกระทบคือการลดการปล่อยเพื่อจำกัดการเปลี่ยนแปลง การปรับตัวคือการรับมือกับการเปลี่ยนแปลงที่เกิดขึ้นแล้ว ต้องทำทั้งสองอย่าง"], "take2": ["การป้อนกลับเชิงบวกขยายการเปลี่ยนแปลง เมื่อโลกอุ่นขึ้น น้ำแข็งละลาย ค่าการสะท้อนแสงลดลง ดูดกลืนแสงอาทิตย์มากขึ้น และยิ่งร้อนขึ้น", "การป้อนกลับเชิงลบต้านการเปลี่ยนแปลง เมื่อโลกอุ่นขึ้น การผุพังของหินเร็วขึ้น ดึง CO₂ ออกจากอากาศ และทำให้โลกเย็นลง", "วงจรทั้งสองทำงานในช่วงเวลาที่ต่างกันมาก การป้อนกลับจากน้ำแข็งและค่าการสะท้อนแสงเกิดขึ้นภายในหลายสิบปี ขณะที่การผุพังของหินใช้เวลาหลายแสนปี จึงไม่สามารถชดเชยภาวะโลกร้อนจากมนุษย์ได้ในช่วงชีวิตของเรา"], "take3": ["โลกจะร้อนขึ้นเท่าใดภายในปี ค.ศ. 2100 ขึ้นอยู่กับการปล่อยก๊าซเป็นหลัก ตั้งแต่ราว 1.4 °C หากปล่อยต่ำมาก ไปจนถึงราว 4.4 °C หากปล่อยสูงมาก", "แหล่งความไม่แน่นอนหลักเปลี่ยนไปตามเวลา คือความแปรปรวนตามธรรมชาติในไม่กี่ปีข้างหน้า ความแตกต่างระหว่างแบบจำลองช่วงกลางศตวรรษ และการตัดสินใจของมนุษย์ช่วงปลายศตวรรษ", "การคาดการณ์ภูมิอากาศมีเงื่อนไข คือ “ถ้าเราเดินตามเส้นทางนี้ ผลจะเป็น…” และประมาณค่าเฉลี่ยระยะยาว จึงคาดการณ์ภูมิอากาศล่วงหน้าหลายสิบปีได้ แม้จะพยากรณ์อากาศได้เพียงราวสิบวัน"], "nameOnly": "ชื่อ-นามสกุล", "sidLabel": "รหัสนิสิต", "noId": "ยังไม่ได้ใส่", "keyTakeH": "ประเด็นสำคัญ", "keyTakeSub": "แนวคิดหลักของแต่ละรอบสำหรับทบทวน ไม่ต้องรวมส่วนนี้ในภาพที่แคป"}, "loops": {"pos": [9, 2, 6, 4, 7], "neg": [10, 1, 5, 8, 3]}}};
+let lang='en', tab=0, deck=null, idx=0;
+let r3={est:[null,null,null,null,null],aChecked:false,aScore:null,b:{},bChecked:false,bFirst:null,bChecks:0};
+let picks={0:{},1:{}}, checked={0:false,1:false}, revealed={0:false,1:false};
+let student='', sid='', stats={0:{first:null,firstWrong:[],checks:0,revealed:false},1:{first:null,firstWrong:[],checks:0,revealed:false}};
+let r2s={checks:0,solvedAt:null}, sentence='', corr=[{key:'',text:''},{key:'',text:''}];
+let sel=null, loops=[[null,null,null,null,null],[null,null,null,null,null]], ltype=[null,null], lchecked=false;
+const $=id=>document.getElementById(id);
+const D=()=>DATA[lang], U=()=>DATA[lang].ui;
+
+/* remember progress on this device */
+const SKEY='climate-match-solo-v1';
+function save(){try{localStorage.setItem(SKEY,JSON.stringify({lang,picks,checked,revealed,loops,ltype,student,sid,stats,r2s,sentence,corr,r3}))}catch(e){}}
+function load(){try{const s=JSON.parse(localStorage.getItem(SKEY)||'null'); if(s){lang=s.lang||lang;
+  picks=s.picks||picks; checked=s.checked||checked; revealed=s.revealed||revealed; loops=s.loops||loops; ltype=s.ltype||ltype;
+  student=s.student||''; sid=s.sid||''; stats=s.stats||stats; r2s=s.r2s||r2s; sentence=s.sentence||''; corr=s.corr||corr; if(s.r3)r3=Object.assign(r3,s.r3);}}catch(e){}}
+
+/* Header: warming stripes 1850–2100, one 50-year block per finished part */
+const ANOM=(()=>{const out=[];let s=7;const rnd=()=>{s=(s*9301+49297)%233280;return s/233280-.5};
+  const k=[[1850,-.05],[1910,-.15],[1945,.1],[1975,.05],[2000,.55],[2020,1.1],[2050,1.9],[2100,2.7]];
+  for(let y=1850;y<2100;y+=5){let i=0;while(k[i+1][0]<y)i++;const [y0,a0]=k[i],[y1,a1]=k[i+1];
+    const base=a0+(a1-a0)*(y-y0)/(y1-y0);out.push(base+(y<2025?rnd()*.22:rnd()*.08));}return out;})();
+const STOPS=[[-.25,[8,81,156]],[.05,[107,174,214]],[.3,[247,247,247]],[.75,[251,106,74]],[1.25,[203,24,29]],[2.0,[153,0,13]],[2.8,[74,0,6]]];
+function stripeColor(a){if(a<=STOPS[0][0])return `rgb(${STOPS[0][1]})`;for(let i=0;i<STOPS.length-1;i++){const [x0,c0]=STOPS[i],[x1,c1]=STOPS[i+1];
+  if(a<=x1){const f=(a-x0)/(x1-x0);return `rgb(${c0.map((c,j)=>Math.round(c+(c1[j]-c)*f)).join(',')})`}}return `rgb(${STOPS.at(-1)[1]})`}
+function deckRight(i){const dk=D().decks[i],P=picks[i];return dk.defs.filter(d=>P[d.letter]&&dk.answers[P[d.letter]]===d.letter).length}
+function partsDone(){return [0,1].map(i=>checked[i]&&(deckRight(i)===12||revealed[i]))
+  .concat([loopsRight(), r3.aChecked, r3.bChecked&&bScore()===5])}
+function nRight(){const dk=D().decks[deck],P=picks[deck];return dk.defs.filter(d=>P[d.letter]&&dk.answers[P[d.letter]]===d.letter).length}
+function drawKeeling(){
+  const done=partsDone(), next=done.indexOf(false), w=600/ANOM.length, u=U();
+  let s=ANOM.map((a,i)=>`<rect x="${(i*w).toFixed(2)}" y="0" width="${(w+.6).toFixed(2)}" height="44" fill="${stripeColor(a)}"/>`).join('');
+  s+=done.map((d,i)=>`<rect class="veil" x="${i*120}" y="0" width="120" height="44" opacity="${d?0:(i===next?.62:.86)}"/>`).join('');
+  s+=[1,2,3,4].map(i=>`<rect x="${i*120-1}" y="0" width="2" height="44" fill="var(--paper)"/>`).join('');
+  if(next>=0) s+=`<rect class="cur" x="${next*120+2.5}" y="1.25" width="${120-5}" height="41.5" rx="5"/>`;
+  $('stripes').innerHTML=s; $('stripes').setAttribute('aria-label',u.stripesAria);
+  $('seglab').innerHTML=u.segs.map((l,i)=>`<span class="${done[i]?'sdone':''}">${done[i]?'✓ ':''}${l}</span>`).join('');
+  $('scap').textContent=u.stripesCap;
+  $('kright').textContent=done.filter(Boolean).length+' / 5 '+u.partsDone;
+}
+function render(){
+  document.documentElement.lang=lang==='th'?'th':'en'; document.title=U().title;
+  $('h1').textContent=U().title;$('sub').textContent=U().sub;$('lang').textContent=U().lang;
+  document.documentElement.style.setProperty('--accent',deck===1?'var(--deckB)':'var(--deckA)');
+  const K=['t0','r1','r2','r3','t4'];
+  $('nav').innerHTML=K.map((k,i)=>`<button aria-selected="${tab===i}" onclick="go(${i})">${U()[k]}<span class="n">${U()[k+'full']}</span></button>`).join('');
+  $('main').innerHTML=[guide,r1,r2,r3f,summ][tab]();
+  drawKeeling(); save();
+}
+function go(i){tab=i;render();window.scrollTo(0,0)}
+$('lang').onclick=()=>{lang=lang==='th'?'en':'th';sel=null;render()};
+
+/* ---------- Round 1: solo match ---------- */
+function r1(){
+  if(deck===null) return `<p class="q">${U().pickDeck}</p>`+[0,1].map(i=>{
+      const n=Object.values(picks[i]).filter(Boolean).length;
+      return `<button class="big" onclick="setDeck(${i})"><span class="dot" style="background:var(--deck${i?'B':'A'})"></span>
+      <span><span class="t">${i?U().deckB:U().deckA}</span>${n?`<span class="d">${n}/12 ${U().answered}</span>`:''}</span></button>`}).join('');
+  const dk=D().decks[deck],P=picks[deck],c=dk.defs[idx],chosen=P[c.letter],ck=checked[deck],rv=revealed[deck];
+  const correctTerm=Object.keys(dk.answers).find(k=>dk.answers[k]===c.letter);
+  const state=ck&&chosen?(dk.answers[chosen]===c.letter?'ok':'no'):'';
+  const owner={}; for(const l in P) if(P[l]) owner[P[l]]=l;
+  const terms=dk.terms.map(t=>{
+    const mine=chosen===t.id, o=owner[t.id];
+    let cls=''; if(mine&&ck) cls=state; else if(o&&!mine) cls='taken';
+    if(rv&&ck&&state==='no'&&t.id===correctTerm) cls+=' sol';
+    return `<button class="term ${cls}" aria-pressed="${mine}" onclick="choose('${t.id}')"><span>${t.text}</span>${o?`<span class="tag">${o}</span>`:''}</button>`}).join('');
+  const dots=dk.defs.map((d,i)=>{let cl=P[d.letter]?'done':''; if(ck&&P[d.letter]) cl=dk.answers[P[d.letter]]===d.letter?'ok':'no';
+    return `<button class="${cl} ${i===idx?'cur':''}" onclick="jump(${i})" aria-label="${d.letter}">${d.letter}</button>`}).join('');
+  let out=`<div class="rolebar"><span class="dot"></span><span>${deck?U().deckB:U().deckA}</span><button onclick="deck=null;render()">${U().change}</button></div>
+  <div class="reader ${state}">
+    <div class="rtop"><span class="badge">${c.letter}</span><span class="count">${idx+1} ${U().of} 12</span>
+      <span class="arrows"><button onclick="step(-1)" ${idx===0?'disabled':''} aria-label="${U().prev}">‹</button>
+      <button onclick="step(1)" ${idx===11?'disabled':''} aria-label="${U().next}">›</button></span></div>
+    <p class="readtxt">${c.text}</p>
+  </div>
+  <p class="hint">${U().soloHint}</p>
+  <div class="terms">${terms}</div>
+  <div class="dots">${dots}</div>
+  <button class="btn" onclick="check()">${ck?U().recheck:U().check}</button>`;
+  if(ck){const n=nRight();
+    out+=`<div class="banner ${n===12?'good':'bad'}"><span class="score">${n}</span>${U().scored}<br>${n===12?U().allRight:U().tryAgain}</div>`;
+    if(n<12&&!rv) out+=`<button class="btn ghost" onclick="revealed[deck]=true;stats[deck].revealed=true;render()">${U().reveal}</button>`;
+    out+=`<div class="review"><p class="q">${U().yourMatches}</p>`+dk.defs.map((d,i)=>{
+      const pk=P[d.letter],ok=pk&&dk.answers[pk]===d.letter,term=pk?dk.terms.find(t=>t.id===pk).text:U().notAnswered;
+      const ct=dk.terms.find(t=>dk.answers[t.id]===d.letter).text;
+      return `<button class="rrow ${ok?'ok':'no'}" onclick="jump(${i})"><span class="l">${d.letter}</span><span class="x">
+        <span class="tm">${ok?'✓ ':'✗ '}${term}</span><span class="ds">${d.text.replace(/<[^>]+>/g,'')}</span>
+        ${rv&&!ok?`<span class="ans">${U().answer}: ${ct}</span>`:''}</span></button>`}).join('')+`</div>`;
+  }
+  out+=`<button class="btn ghost" onclick="startOver()">${U().startOver}</button>`;
+  return out;
+}
+function setDeck(i){deck=i;idx=firstOpen();render()}
+function firstOpen(){const dk=D().decks[deck];const i=dk.defs.findIndex(d=>!picks[deck][d.letter]);return i<0?0:i}
+function step(n){idx=Math.max(0,Math.min(11,idx+n));render()}
+function jump(i){idx=i;render();window.scrollTo({top:0,behavior:'smooth'})}
+function choose(id){
+  const P=picks[deck],L=D().decks[deck].defs[idx].letter;
+  if(P[L]===id){P[L]='';return render()}
+  for(const l in P) if(P[l]===id) P[l]='';   /* each term matches one card */
+  P[L]=id;
+  if(!checked[deck]&&idx<11) setTimeout(()=>{idx++;render()},220);
+  render();
+}
+function check(){
+  const s=stats[deck],dk=D().decks[deck],P=picks[deck];
+  s.checks++;
+  if(s.first===null){s.first=nRight();s.firstWrong=dk.defs.filter(d=>!(P[d.letter]&&dk.answers[P[d.letter]]===d.letter)).map(d=>d.letter);}
+  checked[deck]=true;render()}
+function startOver(){picks[deck]={};checked[deck]=false;revealed[deck]=false;idx=0;render()}
+
+/* ---------- Round 2: build the loop ---------- */
+function r2(){
+  const cards=D().chain,used=loops.flat().filter(Boolean);
+  const slots=li=>`<div class="slots">${loops[li].map((v,si)=>{let cls=v?'filled':'';if(lchecked&&v)cls+=okLoop(li)?' ok':' no';
+    return `<button class="slot ${cls}" onclick="place(${li},${si})">${v||'·'}</button>`}).join('')}</div>`;
+  const types=li=>`<div class="types"><button aria-pressed="${ltype[li]==='pos'}" onclick="setType(${li},'pos')">${U().positive}</button>
+    <button aria-pressed="${ltype[li]==='neg'}" onclick="setType(${li},'neg')">${U().negative}</button></div>`;
+  const pool=`<div class="pool">${cards.map(c=>`<button class="chip ${used.includes(c.n)?'used':''}" aria-pressed="${sel===c.n}" onclick="pick(${c.n})"><span class="num">${c.n}</span><span>${c.text}</span></button>`).join('')}</div>`;
+  let out=`<p class="q">${U().chainHint}</p>`+pool+`<div class="lt">${U().loop1}</div>`+slots(0)+types(0)+
+    `<div class="lt">${U().loop2}</div>`+slots(1)+types(1)+
+    `<button class="btn" style="background:var(--loop)" onclick="checkLoops()">${U().checkLoops}</button>`+
+    `<button class="btn ghost" onclick="clearLoops()">${U().clear}</button>`;
+  if(lchecked) out+=`<div class="banner ${loopsRight()?'good':'bad'}">${loopsRight()?U().loopsRight:U().loopsWrong}</div>`;
+  return out;
+}
+function pick(n){sel=sel===n?null:n;render()}
+function place(li,si){if(loops[li][si]){loops[li][si]=null;sel=null;lchecked=false;return render()}
+  if(sel===null)return;loops[li][si]=sel;sel=null;lchecked=false;render()}
+function setType(li,t){ltype[li]=t;lchecked=false;render()}
+function clearLoops(){loops=[[null,null,null,null,null],[null,null,null,null,null]];ltype=[null,null];sel=null;lchecked=false;render()}
+function checkLoops(){lchecked=true;r2s.checks++;if(loopsRight()&&r2s.solvedAt===null)r2s.solvedAt=r2s.checks;render()}
+function rotOK(a,ans){if(a.some(v=>!v))return false;for(let r=0;r<5;r++)if(a.every((v,i)=>v===ans[(i+r)%5]))return true;return false}
+function okLoop(li){const L=D().loops;return rotOK(loops[li],L.pos)||rotOK(loops[li],L.neg)}
+function loopsRight(){const L=D().loops;
+  return (rotOK(loops[0],L.pos)&&ltype[0]==='pos'&&rotOK(loops[1],L.neg)&&ltype[1]==='neg')||
+         (rotOK(loops[0],L.neg)&&ltype[0]==='neg'&&rotOK(loops[1],L.pos)&&ltype[1]==='pos')}
+
+/* ---------- Guide ---------- */
+function guide(){const g=U();
+  return `<div class="sect guide"><h2>${g.gTitle}</h2><p class="intro">${g.gIntro}</p>
+    <ol class="steps">${g.gSteps.map(s=>`<li><div><b>${s[0]}</b><span>${s[1]}</span></div></li>`).join('')}</ol>
+    <div class="know"><strong>${g.gKnowH}</strong>${g.gKnow.map(k=>`<p>• ${k}</p>`).join('')}</div>
+    <button class="btn" onclick="go(1)">${g.gStart}</button></div>`;}
+
+/* ---------- Round 3: forecasting ---------- */
+const R3={
+ ssp:[{n:'SSP1-1.9',best:1.4,lo:1.0,hi:1.8},{n:'SSP1-2.6',best:1.8,lo:1.3,hi:2.4},{n:'SSP2-4.5',best:2.7,lo:2.1,hi:3.5},
+      {n:'SSP3-7.0',best:3.6,lo:2.8,hi:4.6},{n:'SSP5-8.5',best:4.4,lo:3.3,hi:5.7}],
+ ans:[0,1,2,0,0]};
+function bScore(){return R3.ans.filter((a,i)=>r3.b[i]===a).length}
+function r3f(){const u=U(),T=u.fc;
+  const rows=R3.ssp.map((s,i)=>{const v=r3.est[i],ok=r3.aChecked&&v>=s.lo&&v<=s.hi;
+    const cls=r3.aChecked?(ok?'ok':'no'):'';
+    const pct=x=>(x/6*100).toFixed(1)+'%';
+    return `<div class="sc ${cls}"><div class="top"><span class="nm">${s.n}</span>
+      <span class="val ${v===null?'unset':''}" id="v${i}">${v===null?u.fcUnset:v.toFixed(1)+' °C'}</span></div>
+      <div class="story">${T.ssp[i].story}</div><div class="ds">${T.ssp[i].text}</div>
+      ${r3.aChecked?`<div class="track"><div class="band" style="left:${pct(s.lo)};width:${pct(s.hi-s.lo)}"></div>
+        <div class="best" style="left:${pct(s.best)}"></div><div class="me" style="left:${pct(v)}"></div></div>
+        <div class="rlab"><span>0 °C</span><span>${u.fcIpcc}: ${s.best} (${s.lo}–${s.hi}) °C</span><span>6 °C</span></div>`
+      :`<input type="range" min="0" max="6" step="0.1" value="${v===null?3:v}" aria-label="${s.n}" oninput="setEst(${i},this.value)">`}</div>`}).join('');
+  let a=`<div class="sect"><h2>${u.partA}: ${T.aTitle}</h2><p class="small">${T.aIntro}</p>
+    <div class="know" style="margin-top:4px"><strong>${T.nameH}</strong><p>${T.nameP}</p></div></div>`+rows;
+  if(!r3.aChecked) a+=`<button class="btn" onclick="checkA()">${u.check}</button><div class="warn" id="aw"></div>`;
+  else a+=`<div class="banner ${r3.aScore>=4?'good':'bad'}"><span class="score">${r3.aScore}</span>/5 ${u.inRange}<br>${T.aTake}</div>`;
+  const qs=T.q.map((q,qi)=>{const pickd=r3.b[qi];
+    const opts=q.o.map((o,oi)=>{let cls='';if(r3.bChecked&&pickd===oi)cls=oi===R3.ans[qi]?'ok':'no';
+      return `<button class="opt ${cls}" aria-pressed="${pickd===oi}" onclick="pickB(${qi},${oi})">${o}</button>`}).join('');
+    let ex='';if(r3.bChecked&&pickd!==undefined){ex=pickd===R3.ans[qi]?`<div class="expl">✓ ${q.e}</div>`:`<div class="expl no">✗ ${T.tryOther}</div>`}
+    return `<div class="mc"><p class="qq">${qi+1}. ${q.t}</p>${opts}${ex}</div>`}).join('');
+  let b=`<div class="sect" style="margin-top:22px"><h2>${u.partB}: ${T.bTitle}</h2><p class="small">${T.bIntro}</p></div>`+qs+
+    `<button class="btn" onclick="checkB()">${r3.bChecked?u.recheck:u.check}</button><div class="warn" id="bw3"></div>`;
+  if(r3.bChecked){const n=bScore();b+=`<div class="banner ${n===5?'good':'bad'}"><span class="score">${n}</span>/5<br>${n===5?T.bAll:T.bTry}</div>`;}
+  return a+b;}
+function setEst(i,v){r3.est[i]=parseFloat(v);const el=$('v'+i);el.textContent=r3.est[i].toFixed(1)+' °C';el.classList.remove('unset');save()}
+function checkA(){if(r3.est.some(v=>v===null)){$('aw').textContent=U().fc.aMissing;return}
+  r3.aChecked=true;r3.aScore=R3.ssp.filter((s,i)=>r3.est[i]>=s.lo&&r3.est[i]<=s.hi).length;render()}
+function pickB(q,o){r3.b[q]=o;render()}
+function checkB(){if(Object.keys(r3.b).length<5){$('bw3').textContent=U().fc.bMissing;return}
+  r3.bChecks++;if(r3.bFirst===null)r3.bFirst=bScore();r3.bChecked=true;render()}
+
+/* ---------- Summary / submit ---------- */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function cardInfo(key){if(!key)return null;const [dI,L]=key.split(':');const dk=D().decks[+dI];
+  const d=dk.defs.find(x=>x.letter===L), t=dk.terms.find(x=>dk.answers[x.id]===L);
+  return {deck:+dI,letter:L,def:d.text,term:t.text};}
+function corrOptions(){
+  let keys=[];[0,1].forEach(i=>stats[i].firstWrong.forEach(L=>keys.push(i+':'+L)));
+  const bothChecked=stats[0].first!==null&&stats[1].first!==null;
+  return {keys,bothChecked,notNeeded:!keys.length&&bothChecked};}
+function badWords(s){return /\b(good|bad)\b/i.test(s)||/แย่/.test(s)}
+function nameHTML(){return student.trim()?esc(student):`<span class="empty">${U().noName}</span>`}
+function sidHTML(){const u=U();return `${u.sidLabel}: `+(sid.trim()?`<b>${esc(sid)}</b>`:`<span class="empty">${u.noId}</span>`)}
+function setSid(v){sid=v;const el=$('sidv');if(el)el.innerHTML=sidHTML();save()}
+function setName(v){student=v;const el=$('who');if(el)el.innerHTML=nameHTML();save()}
+function summ(){
+  const u=U(), now=new Date(), yn=b=>b?u.yes:u.no, done=partsDone();
+  const row=i=>{const s=stats[i];
+    return `<tr><td>${u.segs[i]}</td>${s.first===null?`<td colspan="4" class="empty">${u.notChecked}</td>`:
+      `<td class="n">${s.first}/12</td><td class="n">${deckRight(i)}/12</td><td class="n">${s.checks}</td><td>${yn(s.revealed)}</td>`}</tr>`};
+  const tk=(h,list)=>`<h3>${h}</h3><ul>${list.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+  const w=600/ANOM.length;
+  const mini=`<svg class="stripes mini" viewBox="0 0 600 44" preserveAspectRatio="none" aria-hidden="true">${ANOM.map((a,i)=>`<rect x="${(i*w).toFixed(2)}" y="0" width="${(w+.6).toFixed(2)}" height="44" fill="${stripeColor(a)}"/>`).join('')}
+    ${done.map((d,i)=>`<rect class="veil" x="${i*120}" y="0" width="120" height="44" opacity="${d?0:.86}"/>`).join('')}</svg>`;
+  return `<div class="sect idrow"><label class="field"><span>${u.nameOnly}</span>
+      <input value="${esc(student)}" oninput="setName(this.value)" autocomplete="name"></label>
+      <label class="field"><span>${u.sidLabel}</span>
+      <input value="${esc(sid)}" oninput="setSid(this.value)" inputmode="numeric" autocomplete="off"></label></div>
+    <div class="summary"><div class="capture"><span class="ic">📸</span><span>${u.captureBig}<small>${u.captureSmall}</small></span></div>
+    <div class="sh"><div><div class="q" style="margin:0">${u.cardTitle}</div><div class="who" id="who">${nameHTML()}</div><div class="sid" id="sidv">${sidHTML()}</div><div class="small" style="margin:2px 0 0">${u.title}</div></div>
+      <div class="when">${now.toLocaleDateString(lang==='th'?'th-TH':'en-GB')}<br>${now.toLocaleTimeString(lang==='th'?'th-TH':'en-GB',{hour:'2-digit',minute:'2-digit'})}</div></div>
+    ${mini}<div class="prog">${done.filter(Boolean).length} / 5 ${u.partsDone}</div>
+    <h3>${u.r1} · ${u.r1full}</h3>
+    <div style="overflow-x:auto"><table><tr><th></th><th>${u.firstTry}</th><th>${u.finalScore}</th><th>${u.checksL}</th><th>${u.revealedL}</th></tr>${row(0)}${row(1)}</table></div>
+    <h3>${u.r2} · ${u.r2full}</h3>
+    <table><tr><th>${u.solvedL}</th><th>${u.checksL}</th><th>${u.solvedOn}</th></tr>
+      <tr><td>${yn(loopsRight())}</td><td class="n">${r2s.checks}</td><td class="n">${r2s.solvedAt??'—'}</td></tr></table>
+    <h3>${u.r3} · ${u.r3full}</h3>
+    <table><tr><th></th><th>${u.firstTry}</th><th>${u.finalScore}</th><th>${u.checksL}</th></tr>
+      <tr><td>${u.partA}</td>${r3.aChecked?`<td class="n" colspan="3">${r3.aScore}/5 ${u.inRange}</td>`:`<td colspan="3" class="empty">${u.notChecked}</td>`}</tr>
+      <tr><td>${u.partB}</td>${r3.bFirst===null?`<td colspan="3" class="empty">${u.notChecked}</td>`:`<td class="n">${r3.bFirst}/5</td><td class="n">${bScore()}/5</td><td class="n">${r3.bChecks}</td>`}</tr></table>
+    </div>
+    <div class="sect takes"><h2>${u.keyTakeH}</h2><p class="small">${u.keyTakeSub}</p>
+      ${tk(u.r1+' · '+u.r1full,u.take1)}${tk(u.r2+' · '+u.r2full,u.take2)}${tk(u.r3+' · '+u.r3full,u.take3)}</div>`;
+}
+
+load(); render();
+</script>
+</body>
+</html>
